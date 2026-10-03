@@ -1,6 +1,7 @@
+#Project link: https://github.com/rozie7/WEATHER-REPORT
 """
-Weather Report for Nairobi, Kenya for the next 3 days using Open-Meteo API.
-Branch: feature/weather-api
+Shows a 3-day forecast (06:00 and 15:00 readings plus a daily summary)
+using real data from the free Open-Meteo API.
 
 """
 
@@ -113,6 +114,7 @@ def print_report(data):
     print(thick_line)
     print(f"Weather forecast for {CITY_NAME}")
     print("Data source: Open-Meteo API (06:00 and 15:00 readings)")
+    print("All times are Nairobi local time (GMT+3)")
     print(thick_line)
 
     # Go through each day one by one
@@ -137,6 +139,7 @@ def print_report(data):
         print()
         print(thick_line)
 
+    print("Forecast data provided by Open-Meteo.com")
 
 def main():
     """Get the forecast and print the report."""
