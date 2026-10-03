@@ -13,11 +13,49 @@ API_URL = "https://api.open-meteo.com/v1/forecast?latitude=-1.2833&longitude=36.
 # This is the API URL copied from the Open-Meteo website
 
 def get_forecast():
-    """Ask Open-Meteo for the forecast and return it as a dictionary."""
-    response = requests.get(API_URL, timeout=10)
+    """Ask Open-Meteo for the forecast.
+    Returns a dictionary, or None if something went wrong."""
+    # "try" runs the risky code. If it fails, Python jumps to "except"
+    # if the request fails, we catch the exception and print a message instead of crashing
+    try:
+        # Send the request and wait up to 10 seconds
+        response = requests.get(API_URL, timeout=10)
+        # Raise an error if the server answered with a failure code (404, 500...)
+        response.raise_for_status()
+        # Convert the JSON text into a Python dictionary
+        data = response.json()
+    except requests.exceptions.ConnectionError:
+        print("Error: Could not connect to the internet.")
+        print("Please check your connection and try again.")
+        return None
+    except requests.exceptions.Timeout:
+        print("Error: The weather server took too long to answer.")
+        print("Please try again in a moment.")
+        return None
+    except requests.exceptions.HTTPError as error:
+        print(f"Error: The weather server reported a problem ({error}).")
+        return None
+    except ValueError:
+        # Happens when the answer is not valid JSON
+        print("Error: The weather server sent data in an unexpected format.")
+        return None
+    except requests.exceptions.RequestException as error:
+        # Catches any other request problem
+        print(f"Error: The request failed ({error}).")
+        return None
 
-    # Converts the JSON text from the API into a Python dictionary
-    return response.json()
+    # Open-Meteo can report a problem inside the data with "error": true
+    if isinstance(data, dict) and data.get("error"):
+        print(f"Error from the weather API: {data.get('reason', 'unknown reason')}")
+        return None
+
+    # Make sure the parts of the forecast we need are present
+    for section in ("daily", "hourly"):
+        if section not in data:
+            print(f"Error: The forecast is missing its '{section}' data.")
+            return None
+
+    return data
 
 
 # Weather codes are numbers from the WMO standard.
@@ -102,12 +140,23 @@ def print_report(data):
 
 def main():
     """Get the forecast and print the report."""
+    # Stop with a friendly message if the URL was not pasted in
     if "PASTE_YOUR" in API_URL:
         print("Please paste your Open-Meteo URL into API_URL first.")
         return
 
     data = get_forecast()
-    print_report(data)
+
+    if data is None:
+        print("The weather report could not be shown.")
+        return
+
+    try:
+        print_report(data)
+    except (KeyError, ValueError, IndexError, TypeError):
+        # Happens if the forecast has missing or unexpected values
+        print("Error: The forecast data was incomplete, "
+              "so the report could not be shown.")
 
 if __name__ == "__main__":
     main()
