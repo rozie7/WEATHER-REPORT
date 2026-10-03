@@ -88,7 +88,7 @@ The program does not crash with a long error message. It prints a short explanat
 WEATHER-REPORT/
 ├── weather_report.py          # the program
 ├── README.md                  # this file
-├── github project address.txt # the GitHub project URL
+├── githublink.txt # the GitHub project URL
 └── captures/               # screenshots of Git and GitHub work
 ```
 
@@ -102,7 +102,7 @@ The project was built with five feature branches, each merged into `main` throug
 | `feature/weather-display` | Format and display the weather report |
 | `feature/error-handling` | Handle network and API errors |
 | `feature/documentation` | Write this README |
-| `feature/project-polish` | Final output improvements and checks |
+| `feature/project-finalise` | Final output improvements and checks |
 
 ## Credits
 
